@@ -6,9 +6,9 @@ import { makeExecutableSchema  } from 'graphql-tools'
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express'
 import  * as express  from 'express'
 
-import * as bodyParser from 'body-parser'
+import  * as bodyParser from 'body-parser'
 
-var url = "mongodb://usuario:solutis@localhost:27017/ezvida"
+var url = "mongodb://usuario:solutis@172.29.40.43:27017/ezvida"
 
 let database: Db
 
@@ -25,6 +25,12 @@ const typeDefs: string[] = [`
     type Report  {
         _id: String
         reportIdentifier: String
+        reportPosition: Location!        
+    }
+    type Location {
+        latitude: Float!
+        longitude: Float!
+        altitude: Float!
     }
     type Query  {
         report(_id: String): Report
@@ -56,14 +62,15 @@ MongoClient.connect(url).then( (db) => {
     database = db    
 })
 /*.then( (any) =>  
-    database.collection('records').insertMany( json, (err, res) => {
+    database.collection('reports').insertMany( json, (err, res) => {
         if (err) throw err;
         console.log('registros inseridos com sucesso')
     }))*/
 .then( async () => {      
-    Reports = database.collection("records")
 
-    console.log( await Reports.find({}).toArray())
+    Reports = await database.collection("reports")
+
+    console.log('reports recuperados do banco')
 
     const app = express()
 
